@@ -1,0 +1,66 @@
+# This action hook sets up everything that is needed to deploy RogueMek
+# for the first time without requiring manual intervention, and easily update
+# to newer releases by only updating a single file containing the release tag
+
+# use the ROGUEMEK_RELEASE file in the repo to determine which war to deploy
+ROGUEMEK_RELEASE_FILE=$OPENSHIFT_REPO_DIR/ROGUEMEK_RELEASE
+ROGUEMEK_RELEASE=$(< $ROGUEMEK_RELEASE_FILE)
+
+# make sure the release variable is set, else exit
+if [ -z "$ROGUEMEK_RELEASE" ]
+then
+    echo ERROR: Unable to deploy RogueMek, release file required: $ROGUEMEK_RELEASE_FILE
+    exit 0
+fi
+
+echo Setting up RogueMek from release $ROGUEMEK_RELEASE
+
+# test to make sure it is a valid tag
+ROGUEMEK_TAG_EXISTS=$(curl -s --head https://github.com/harbdog/roguemek/releases/tag/$ROGUEMEK_RELEASE | head -n 1 | grep "HTTP/1.[01] [23]..")
+if [ -z "$ROGUEMEK_TAG_EXISTS" ]
+then
+    echo ERROR: Release does not exist!
+    exit 0
+fi
+
+echo "https://github.com/harbdog/roguemek/releases/tag/$ROGUEMEK_RELEASE"
+
+# only setup each env variable if they don't yet exist
+if [ -z "$ROGUEMEK_CONFIG" ]
+then
+    echo -n Setting ROGUEMEK_CONFIG=
+    echo $OPENSHIFT_REPO_DIR/RogueMek-config.groovy | tee ~/.env/user_vars/ROGUEMEK_CONFIG
+fi
+
+if [ -z "$JVM_HEAP_RATIO" ]
+then
+    echo -n Setting JVM_HEAP_RATIO=
+    echo 0.6 | tee ~/.env/user_vars/JVM_HEAP_RATIO
+fi
+
+if [ -z "$JVM_PERMGEN_RATIO" ]
+then
+    echo -n Setting JVM_PERMGEN_RATIO=
+    echo 0.2 | tee ~/.env/user_vars/JVM_PERMGEN_RATIO
+fi
+
+
+# only download and deploy the war if it is not already present
+ROGUEMEK_WAR_FILE=$OPENSHIFT_DATA_DIR/RogueMek_$ROGUEMEK_RELEASE.war
+if [ ! -f "$ROGUEMEK_WAR_FILE" ]
+then
+    echo Downloading RogueMek.war...
+    wget -O $ROGUEMEK_WAR_FILE https://github.com/harbdog/roguemek/releases/download/$ROGUEMEK_RELEASE/RogueMek.war
+
+    if [ ! -s "$ROGUEMEK_WAR_FILE" ]
+    then
+        echo ERROR: RogueMek.war does not exist in $ROGUEMEK_RELEASE
+        rm $ROGUEMEK_WAR_FILE
+        exit 0
+    fi
+
+    echo Deploying $ROGUEMEK_WAR_FILE
+    cp $ROGUEMEK_WAR_FILE $OPENSHIFT_REPO_DIR/webapps/ROOT.war
+else
+    echo Assuming previously deployed from $ROGUEMEK_WAR_FILE
+fi

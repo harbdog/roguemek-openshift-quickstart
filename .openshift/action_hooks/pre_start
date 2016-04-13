@@ -1,0 +1,5 @@
+echo Checking required environment variables:
+
+echo JVM_HEAP_RATIO=$JVM_HEAP_RATIO
+echo JVM_PERMGEN_RATIO=$JVM_PERMGEN_RATIO
+echo ROGUEMEK_CONFIG=$ROGUEMEK_CONFIG
