@@ -60,7 +60,10 @@ then
     fi
 
     echo Deploying $ROGUEMEK_WAR_FILE
-    cp $ROGUEMEK_WAR_FILE $OPENSHIFT_REPO_DIR/webapps/ROOT.war
+    mv $ROGUEMEK_WAR_FILE $OPENSHIFT_REPO_DIR/webapps/ROOT.war
+    
+    # create marker to indicate this war was deployed
+    touch $ROGUEMEK_WAR_FILE
 else
     echo Assuming previously deployed from $ROGUEMEK_WAR_FILE
 fi
