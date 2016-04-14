@@ -1,6 +1,8 @@
 ## About
 This is an OpenShift quickstart repository containing action hooks to automatically download, setup, and deploy the [RogueMek](https://github.com/harbdog/roguemek) application during the build process.
 
+Current RogueMek version deployed: [v0.2.15b](https://github.com/harbdog/roguemek/releases/tag/v0.2.15b)
+
 ## Instructions
 1. Go to the OpenShift application console:
 https://openshift.redhat.com/app/console/applications
