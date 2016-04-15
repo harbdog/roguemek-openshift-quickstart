@@ -47,7 +47,8 @@ fi
 
 # only download and deploy the war if it is not already present
 ROGUEMEK_WAR_FILE=$OPENSHIFT_DATA_DIR/RogueMek_$ROGUEMEK_RELEASE.war
-if [ ! -f "$ROGUEMEK_WAR_FILE" ]
+ROGUEMEK_WAR_DEPLOYED_MARKER=$ROGUEMEK_WAR_FILE.deployed
+if [ ! -f "$ROGUEMEK_WAR_DEPLOYED_MARKER" ]
 then
     echo Downloading RogueMek.war...
     wget -O $ROGUEMEK_WAR_FILE https://github.com/harbdog/roguemek/releases/download/$ROGUEMEK_RELEASE/RogueMek.war
@@ -62,8 +63,9 @@ then
     echo Deploying $ROGUEMEK_WAR_FILE
     mv $ROGUEMEK_WAR_FILE $OPENSHIFT_REPO_DIR/webapps/ROOT.war
     
-    # create marker to indicate this war was deployed
-    touch $ROGUEMEK_WAR_FILE
+    # delete existing marker, then create marker to indicate this release was deployed
+    rm $OPENSHIFT_DATA_DIR/*.war.deployed
+    touch $ROGUEMEK_WAR_DEPLOYED_MARKER
 else
     echo Assuming previously deployed from $ROGUEMEK_WAR_FILE
 fi
