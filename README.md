@@ -18,7 +18,9 @@ https://openshift.redhat.com/app/console/applications
 
 6. This application doesn't yet support Scaling and all other defaults are fine.
 
-7. Create Application, and wait. It will take over 10 minutes to fully start up the first time, even after the page says it was created.
+7. Create Application, and wait. It will take about 5 minutes to fully start up the first time, even after the page says it was created.
+
+8. You will want to immediately Register your first user since it will be created as an administrator user.
 
 ## Customization
 For quickstart customization information, the OpenShift `jbossews` cartridge documentation can be found at:
